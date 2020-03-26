@@ -1,13 +1,15 @@
 package e
 
-var MsgFlags = map[int]string {
-	SUCCESS : "ok",
-	ERROR : "fail",
+var MsgFlags = map[RCode]string {
+	Success : "ok",
+	Error : "fail",
+	ErrorInvalidParams : "invalid params",
+	ErrorExistModule : "module exist",
 }
-func GetMsg(code int) string {
+func GetMsg(code RCode) string {
 	msg, ok := MsgFlags[code]
 	if ok {
 		return  msg
 	}
-	return MsgFlags[ERROR]
+	return MsgFlags[Error]
 }

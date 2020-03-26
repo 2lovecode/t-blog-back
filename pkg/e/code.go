@@ -1,6 +1,12 @@
 package e
 
+type RCode int64
 const (
-	SUCCESS = 200
-	ERROR = 500
+	Success RCode = 200000
+	Error = 500000
+
+	ErrorInvalidParams = 400000
+
+	ErrorExistModule = 400100
+
 )

@@ -2,6 +2,8 @@
 node_modules
 /dist
 runtime
+vendor
+data
 
 # local env files
 .env.local

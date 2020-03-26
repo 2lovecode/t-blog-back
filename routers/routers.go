@@ -20,12 +20,12 @@ func InitRouter() *gin.Engine {
 
 	apiV1 := r.Group("/api/v1")
 	{
-		//分类
-		apiV1.GET("/categories", v1.GetCategoryList)
-		apiV1.GET("/category/:id", v1.GetCategoryDetail)
-		apiV1.POST("/category", v1.AddCategory)
-		apiV1.PUT("/category/:id", v1.EditCategory)
-		apiV1.DELETE("/category/:id", v1.SoftDeleteCategory)
+		//模块
+		apiV1.GET("/modules", v1.GetModuleList)
+		apiV1.GET("/module/:id", v1.GetModuleDetail)
+		apiV1.POST("/module", v1.AddModule)
+		apiV1.PUT("/module/:id", v1.EditModule)
+		apiV1.DELETE("/module/:id", v1.SoftDeleteModule)
 
 		//文章
 		apiV1.GET("/articles", v1.GetArticleList)
