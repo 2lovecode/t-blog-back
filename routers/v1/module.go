@@ -10,6 +10,9 @@ import (
 	"t-blog-back/pkg/utils"
 )
 
+type AddModuleReq struct {
+	Name string `json:"name"`
+}
 //获取模块列表
 func GetModuleList(c *gin.Context) {
 	sql.Open("sqlite3", "")
@@ -19,31 +22,35 @@ func GetModuleDetail(c *gin.Context) {
 
 }
 
-
 //添加模块
 func AddModule(c *gin.Context) {
-	name := c.Request.Body
-
-	valid := validation.Validation{}
-
-	valid.Required(name, "name").Message("名字不能为空")
-	valid.MaxSize(name, 1, "name").Message("名字最长为100字符")
+	var req AddModuleReq
+	err := c.BindJSON(&req)
 
 	var code e.RCode
 	code = e.ErrorInvalidParams
 	eMsg := ""
-
 	data := make(map[string]string)
 
-	if !valid.HasErrors() {
-		if !models.ModuleExistByName(name) {
-			code = e.Success
-			models.AddModule(name)
+	if err == nil {
+		name := req.Name
+		valid := validation.Validation{}
+
+		valid.Required(name, "name").Message("名字不能为空")
+		valid.MaxSize(name, 100, "name").Message("名字最长为100字符")
+
+		if !valid.HasErrors() {
+			if !models.ModuleExistByName(name) {
+				code = e.Success
+				models.AddModule(name)
+			} else {
+				code = e.ErrorExistModule
+			}
 		} else {
-			code = e.ErrorExistModule
+			eMsg = utils.GetFirstErrorMessage(valid)
 		}
 	} else {
-		eMsg = utils.GetFirstErrorMessage(valid)
+		eMsg = err.Error()
 	}
 
 	c.JSON(http.StatusOK, gin.H{
