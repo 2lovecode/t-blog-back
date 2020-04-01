@@ -25,7 +25,7 @@ func GetModuleDetail(c *gin.Context) {
 //添加模块
 func AddModule(c *gin.Context) {
 	var req AddModuleReq
-	err := c.BindJSON(&req)
+	err := c.ShouldBindJSON(&req)
 
 	var code e.RCode
 	code = e.ErrorInvalidParams
@@ -50,15 +50,15 @@ func AddModule(c *gin.Context) {
 			eMsg = utils.GetFirstErrorMessage(valid)
 		}
 	} else {
-		eMsg = err.Error()
+		eMsg = "参数必须为json格式"
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"code" : code,
 		"msg" : e.GetMsg(code),
 		"error": eMsg,
 		"data" : data,
 	})
+
 }
 
 //修改模块

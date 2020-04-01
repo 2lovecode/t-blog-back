@@ -12,7 +12,17 @@ var (
 	HTTPPort int
 	ReadTimeout time.Duration
 	WriteTimeout time.Duration
+	DbCfg DbConfig
 )
+
+type DbConfig struct {
+	Type string
+	User string
+	Pass string
+	Host string
+	Name string
+	TablePrefix string
+}
 
 func init() {
 	var err error
@@ -22,6 +32,7 @@ func init() {
 	}
 	LoadBase()
 	LoadServer()
+	LoadDb()
 }
 
 func LoadBase() {
@@ -37,4 +48,16 @@ func LoadServer() {
 	HTTPPort = sec.Key("HTTP_PORT").MustInt(8080)
 	ReadTimeout = time.Duration(sec.Key("READ_TIMEOUT").MustInt(60)) * time.Second
 	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
+}
+
+func LoadDb() {
+	sec, err := Cfg.GetSection("database")
+	if err != nil {
+		log.Fatalf("Fail to get section 'database': %v", err)
+	}
+	DbCfg.Type = sec.Key("TYPE").MustString("sqlite3")
+	DbCfg.User = sec.Key("USER").MustString("root")
+	DbCfg.Pass = sec.Key("PASS").MustString("root")
+	DbCfg.Name = sec.Key("NAME").MustString("blog")
+	DbCfg.TablePrefix = sec.Key("TABLE_PREFIX").MustString("blog_")
 }

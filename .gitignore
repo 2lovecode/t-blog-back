@@ -4,6 +4,7 @@ node_modules
 runtime
 vendor
 data
+blog
 
 # local env files
 .env.local
