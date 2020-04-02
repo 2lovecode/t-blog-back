@@ -1,29 +1,40 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/setting"
 	"t-blog-back/routers"
+	"time"
 )
 
-var Db *gorm.DB
 
 func main() {
 	router := routers.InitRouter()
 
-	Db, dbErr := gorm.Open(setting.DbCfg.Type, setting.DbCfg.Name)
+	dbCtx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	dbClient, dbErr := mongo.Connect(dbCtx, options.Client().SetAuth(options.Credential{
+		Username:                setting.DbCfg.User,
+		Password:                setting.DbCfg.Pass,
+	}).ApplyURI(setting.DbCfg.Host))
 
 	if dbErr != nil {
 		log.Fatalf("start error: %v", dbErr)
 	}
-	defer Db.Close()
+	dbErr = dbClient.Ping(dbCtx, readpref.Primary())
+	if dbErr != nil {
+		log.Fatalf("start error: %v", dbErr)
+	}
 
-	models.InitTankDb(Db)
+	log.Println("connect db success!")
+
+	models.InitTankDb(dbClient)
 
 	s := &http.Server{
 		Addr: fmt.Sprintf(":%d", setting.HTTPPort),

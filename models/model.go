@@ -1,16 +1,17 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"go.mongodb.org/mongo-driver/mongo"
+	"t-blog-back/pkg/setting"
+)
 
 type Model struct {
-	gorm.Model
 }
 
-var TankDb *gorm.DB
+var tankDbClient *mongo.Client
+var tankDb  *mongo.Database
 
-func InitTankDb(db *gorm.DB) {
-	TankDb = db
-
-	TankDb.AutoMigrate(&Module{})
-	TankDb.AutoMigrate(&Tag{})
+func InitTankDb(dbClient *mongo.Client) {
+	tankDbClient = dbClient
+	tankDb = tankDbClient.Database(setting.DbCfg.Name)
 }

@@ -55,7 +55,8 @@ func LoadDb() {
 	if err != nil {
 		log.Fatalf("Fail to get section 'database': %v", err)
 	}
-	DbCfg.Type = sec.Key("TYPE").MustString("sqlite3")
+	DbCfg.Type = sec.Key("TYPE").MustString("mongodb")
+	DbCfg.Host = sec.Key("HOST").MustString("mongodb://127.0.0.1:27017")
 	DbCfg.User = sec.Key("USER").MustString("root")
 	DbCfg.Pass = sec.Key("PASS").MustString("root")
 	DbCfg.Name = sec.Key("NAME").MustString("blog")

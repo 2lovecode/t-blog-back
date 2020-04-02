@@ -1,5 +1,11 @@
 package models
 
+import (
+	"context"
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"time"
+)
 
 type Tag struct {
 	Model
@@ -8,7 +14,11 @@ type Tag struct {
 }
 
 func GetTags(pageNum int, pageSize int, maps interface{}) (tag Tag) {
-	TankDb.First(&tag, 1)
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	collection := tankDb.Collection("tag")
+	res, _ :=  collection.InsertOne(ctx, bson.M{"name": "pi", "value": 3.14159})
+	fmt.Println(res)
+	tag = Tag{State:12}
 	return
 }
 
