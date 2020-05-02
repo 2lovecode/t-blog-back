@@ -29,7 +29,7 @@ func main() {
 	}
 	dbErr = dbClient.Ping(dbCtx, readpref.Primary())
 	if dbErr != nil {
-		log.Fatalf("start error: %v", dbErr)
+		log.Fatalf("db connection  error: %v", dbErr)
 	}
 
 	log.Println("connect db success!")

@@ -2,11 +2,16 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"t-blog-back/models"
 )
 
+
+
 func GetArticleList(c *gin.Context) {
+	articleList := models.GetArticleList()
 	c.JSON(200, gin.H{
 		"message": "article list",
+		"data": articleList,
 	})
 }
 
