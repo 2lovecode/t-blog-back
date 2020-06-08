@@ -19,6 +19,7 @@ replace (
 
 require (
 	github.com/astaxie/beego v1.12.1
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-ini/ini v1.52.0
 	github.com/sirupsen/logrus v1.4.2
