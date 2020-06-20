@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"t-blog-back/middleware"
 	"t-blog-back/modules"
 	"t-blog-back/pkg/setting"
 )
@@ -10,6 +11,7 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(middleware.Cors())
 	gin.SetMode(setting.RunMode)
 
 	r.GET("/test", func(c *gin.Context) {
