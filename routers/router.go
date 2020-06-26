@@ -2,8 +2,10 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"t-blog-back/middleware"
 	"t-blog-back/modules"
+	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/setting"
 )
 
@@ -15,8 +17,12 @@ func InitRouter() *gin.Engine {
 	gin.SetMode(setting.RunMode)
 
 	r.GET("/test", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "test",
+		code := e.Success
+
+		c.JSON(http.StatusOK, gin.H{
+			"code" : code,
+			"msg" : e.GetMsg(code),
+			"data" : "test message",
 		})
 	})
 

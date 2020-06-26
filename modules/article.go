@@ -2,16 +2,20 @@ package modules
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"t-blog-back/models"
+	"t-blog-back/pkg/e"
 )
-
-
 
 func GetArticleList(c *gin.Context) {
 	articleList := models.GetArticleList()
-	c.JSON(200, gin.H{
-		"message": "article list",
-		"data": articleList,
+
+	code := e.Success
+
+	c.JSON(http.StatusOK, gin.H{
+		"code" : code,
+		"msg" : e.GetMsg(code),
+		"data" : articleList,
 	})
 }
 
