@@ -36,3 +36,11 @@ func SetUp() {
 	tankDbClient = dbClient
 	tankDb = tankDbClient.Database(setting.DbCfg.Name)
 }
+
+func GetDb() *mongo.Database {
+	return tankDb
+}
+
+func GetClient() *mongo.Client {
+	return tankDbClient
+}

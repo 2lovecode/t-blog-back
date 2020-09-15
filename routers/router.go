@@ -28,7 +28,7 @@ func InitRouter() *gin.Engine {
 
 	r.POST("/login", modules.Login)
 
-	apiV1 := r.Group("/api/v1")
+	apiV1 := r.Group("/api/v1", middleware.Login())
 	{
 		//模块
 		apiV1.GET("/modules", modules.GetModuleList)

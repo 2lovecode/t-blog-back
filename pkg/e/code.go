@@ -9,4 +9,6 @@ const (
 
 	ErrorExistModule = 400100
 
+	ErrorInvalidToken = 400200
+
 )

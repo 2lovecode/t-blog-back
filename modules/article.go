@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
+	"t-blog-back/pkg/utils"
 )
 
 func GetArticleList(c *gin.Context) {
@@ -21,7 +22,14 @@ func GetArticleList(c *gin.Context) {
 
 //获取文章详情
 func GetArticleDetail(c *gin.Context) {
+	code := e.Success
 
+	user, _ := utils.GetLoginUserInfo(c)
+	c.JSON(http.StatusOK, gin.H{
+		"code" : code,
+		"msg" : e.GetMsg(code),
+		"data" : user,
+	})
 }
 
 //添加文章

@@ -18,9 +18,9 @@ func Cors() gin.HandlerFunc {
 		}
 		headerStr := strings.Join(headerKeys, ", ")
 		if headerStr != "" {
-			headerStr = fmt.Sprintf("access-control-allow-origin, access-control-allow-headers,X-Token, %s", headerStr)
+			headerStr = fmt.Sprintf("access-control-allow-origin, access-control-allow-headers,X-Token,TankBlog-Token,%s", headerStr)
 		} else {
-			headerStr = "access-control-allow-origin, access-control-allow-headers, X-Token"
+			headerStr = "access-control-allow-origin, access-control-allow-headers, X-Token, TankBlog-Token"
 		}
 
 		c.Header("Access-Control-Allow-Credentials", "true")
