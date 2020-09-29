@@ -13,3 +13,15 @@ func Abort(c *gin.Context, httpCode int, errCode e.RCode, data interface{}) {
 	})
 	return
 }
+
+func AbortWithMessage(c *gin.Context, httpCode int, errCode e.RCode, errMsg string, data interface{}) {
+	if errMsg == "" {
+		errMsg = e.GetMsg(errCode)
+	}
+	c.AbortWithStatusJSON(httpCode, gin.H{
+		"code": errCode,
+		"msg":	errMsg,
+		"data": data,
+	})
+	return
+}

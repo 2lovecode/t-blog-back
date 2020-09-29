@@ -9,6 +9,7 @@ const (
 
 	ErrorExistModule = 400100
 
-	ErrorInvalidToken = 400200
+	ErrorInvalidUserOrPass = 400200
+	ErrorInvalidToken = 400201
 
 )

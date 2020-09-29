@@ -5,6 +5,7 @@ var MsgFlags = map[RCode]string {
 	Error : "fail",
 	ErrorInvalidParams : "无效的参数",
 	ErrorExistModule : "module exist",
+	ErrorInvalidUserOrPass: "用户名或密码错误",
 	ErrorInvalidToken: "无效的token",
 }
 func GetMsg(code RCode) string {

@@ -7,8 +7,13 @@ import (
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
+	"t-blog-back/pkg/utils"
 )
 
+type LoginReq struct {
+	UserName string `form:"username" json:"username" binding:"required"`
+	PassWord string `form:"password" json:"password" binding:"required"`
+}
 type LoginResp struct {
 	Token string `json:"token"`
 }
@@ -21,24 +26,29 @@ type UserInfoResp struct {
 
 func Login(c *gin.Context) {
 
-	userName := c.PostForm("user")
-	userPass := c.PostForm("pass")
-	code := e.Success
+	loginReq := LoginReq{}
+	if err := c.ShouldBindJSON(&loginReq); err == nil {
+		code := e.Success
+		user := models.User{}
 
-	user := models.User{}
+		data := LoginResp{}
+		if u, err := user.FindUserByName(loginReq.UserName); err == nil && bcrypt.CompareHashAndPassword([]byte(u.Pass), []byte(loginReq.PassWord)) == nil {
+			token := uuid.NewV4().String()
+			_, err = user.UpdateToken(loginReq.UserName, token)
+			data.Token = token
+		} else {
+			code = e.Error
+		}
 
-	data := LoginResp{}
-	if u, err := user.FindUserByName(userName); err == nil && bcrypt.CompareHashAndPassword([]byte(u.Pass), []byte(userPass)) == nil {
-		token := uuid.NewV4().String()
-		_, err = user.UpdateToken(userName, token)
-		data.Token = token
+		c.JSON(http.StatusOK, gin.H{
+			"code" : code,
+			"msg" : e.GetMsg(code),
+			"data" : data,
+		})
+	} else {
+		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : data,
-	})
 }
 
 func UserInfo(c *gin.Context) {
