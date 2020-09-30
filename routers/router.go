@@ -30,13 +30,6 @@ func InitRouter() *gin.Engine {
 
 	apiV1 := r.Group("/api/v1", middleware.Login())
 	{
-		//模块
-		apiV1.GET("/modules", modules.GetModuleList)
-		apiV1.GET("/module/:id", modules.GetModuleDetail)
-		apiV1.POST("/module", modules.AddModule)
-		apiV1.PUT("/module/:id", modules.EditModule)
-		apiV1.DELETE("/module/:id", modules.SoftDeleteModule)
-
 		//文章
 		apiV1.GET("/articles", modules.GetArticleList)
 		apiV1.GET("/article/:id", modules.GetArticleDetail)
