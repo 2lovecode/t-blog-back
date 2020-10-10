@@ -14,6 +14,7 @@ type LoginReq struct {
 	UserName string `form:"username" json:"username" binding:"required"`
 	PassWord string `form:"password" json:"password" binding:"required"`
 }
+
 type LoginResp struct {
 	Token string `json:"token"`
 }

@@ -4,16 +4,17 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 type User struct {
-	Name string		`json:"name" bson:"name"`
-	Pass string		`json:"pass" bson:"pass"`
-	Token string 	`json:"token" bson:"token"`
-	Avatar string 	`json:"avatar" bson:"avatar"`
-	State int8 		`json:"state" bson:"state"`
-	AddTime int64 	`json:"add_time" bson:"add_time"`
-	ModifyTime int64  `json:"modify_time" bson:"modify_time"`
+	Name 	string		`json:"name" bson:"name"`
+	Pass 	string		`json:"pass" bson:"pass"`
+	Token 	string 		`json:"token" bson:"token"`
+	Avatar 	string 		`json:"avatar" bson:"avatar"`
+	State 	int8 		`json:"state" bson:"state"`
+	AddTime 	time.Time 	`json:"addTime" bson:"addTime"`
+	ModifyTime 	time.Time  	`json:"modifyTime" bson:"modifyTime"`
 }
 
 func (u *User) Collection() string {

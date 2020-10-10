@@ -4,12 +4,17 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
+const CategoryStateNormal = 1
+const CategoryStateBanned = 0
+
 type Category struct {
-	Name string		`json:"name"`
-	AddTime int64 	`json:"add_time"`
-	ModifyTime int64  `json:"modify_time"`
+	Name 		string		`json:"name" bson:"name"`
+	State 		int8 		`json:"state" bson:"state"`
+	AddTime 	time.Time 	`json:"addTime" bson:"addTime"`
+	ModifyTime 	time.Time  	`json:"modifyTime" bson:"modifyTime"`
 }
 
 func (cg *Category) Collection() string {

@@ -11,5 +11,4 @@ func init() {
 
 func main() {
 	http.Start()
-	//grpc.Start()
 }

@@ -1,23 +1,22 @@
 package models
 
+import "time"
 
 type ArticleList []ArticleEntry
 
 type ArticleEntry struct {
-	ArticleID 		int			`json:"articleID"`
-	Title			string 		`json:"title"`
-	Author			string		`json:"author"`
-	AuthorAvatar 	string		`json:"authorAvatar"`
-	CreatedTime 	string		`json:"createdTime"`
-	Image 			string		`json:"image"`
-	Summary 		string		`json:"summary"`
-	Visited 		string		`json:"visited"`
-	SkipUrl 		string		`json:"skipUrl"`
-	Tags 			[]string 	`json:"tags"`
-}
-
-type Article struct {
-	Model
+	ArticleID 		int			`json:"articleID" bson:"articleID"`
+	CID 			string 		`json:"cid" bson:"cid"`
+	Title			string 		`json:"title" bson:"title"`
+	Author			string		`json:"author" bson:"author"`
+	AuthorAvatar 	string		`json:"authorAvatar" bson:"authorAvatar"`
+	Image 			string		`json:"image" bson:"image"`
+	Summary 		string		`json:"summary" bson:"summary"`
+	Visited 		string		`json:"visited" bson:"visited"`
+	Tags 			[]string 	`json:"tags" bson:"tags"`
+	State 			int8 		`json:"state" bson:"state"`
+	AddTime 		time.Time 	`json:"addTime" bson:"addTime"`
+	ModifyTime 		time.Time  	`json:"modifyTime" bson:"modifyTime"`
 }
 
 func GetArticleList() ArticleList {

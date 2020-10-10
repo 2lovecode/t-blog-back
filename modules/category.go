@@ -1,30 +1,35 @@
 package modules
 
 import (
-	"database/sql"
-	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
+	"time"
 )
 
-type AddModuleReq struct {
-	Name string `json:"name"`
-}
-//获取模块列表
-func GetModuleList(c *gin.Context) {
-	sql.Open("sqlite3", "")
+type AddCategoryReq struct {
+	Name string `form:"name" binding:"required"`
 }
 
-func GetModuleDetail(c *gin.Context) {
+type AddCategoryResp struct {
 
 }
 
-//添加模块
-func AddModule(c *gin.Context) {
-	var req AddModuleReq
+//分类列表
+func GetCategoryList(c *gin.Context) {
+
+}
+
+//分类详情
+func GetCategoryDetail(c *gin.Context) {
+
+}
+
+//添加分类
+func AddCategory(c *gin.Context) {
+	var req AddCategoryReq
 	err := c.ShouldBindJSON(&req)
 
 	var code e.RCode
@@ -33,40 +38,39 @@ func AddModule(c *gin.Context) {
 	data := make(map[string]string)
 
 	if err == nil {
-		name := req.Name
-		valid := validation.Validation{}
+		category := &models.Category{}
 
-		valid.Required(name, "name").Message("名字不能为空")
-		valid.MaxSize(name, 100, "name").Message("名字最长为100字符")
+		category.Name = req.Name
+		category.State = models.CategoryStateNormal
+		category.AddTime = time.Now()
+		category.ModifyTime = time.Now()
 
-		if !valid.HasErrors() {
-			if !models.ModuleExistByName(name) {
-				code = e.Success
-				models.AddModule(name)
-			} else {
-				code = e.ErrorExistModule
+		result, err := category.AddCategory()
+
+		if err == nil {
+			data = map[string]string{
+				"id": result.InsertedID.(string),
 			}
 		} else {
-			eMsg = utils.GetFirstErrorMessage(valid)
+			eMsg = err.Error()
 		}
+		c.JSON(http.StatusOK, gin.H{
+			"code" : code,
+			"msg" : e.GetMsg(code),
+			"error": eMsg,
+			"data" : data,
+		})
 	} else {
-		eMsg = "参数必须为json格式"
+		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"error": eMsg,
-		"data" : data,
-	})
+}
+
+//修改分类
+func EditCategory(c *gin.Context) {
 
 }
 
-//修改模块
-func EditModule(c *gin.Context) {
-
-}
-
-//软删除类
-func SoftDeleteModule(c *gin.Context) {
+//删除分类
+func SoftDeleteCategory(c *gin.Context) {
 
 }
