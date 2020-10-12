@@ -10,7 +10,7 @@ import (
 )
 
 type AddCategoryReq struct {
-	Name string `form:"name" binding:"required"`
+	Name string `form:"name" json:"name" binding:"required"`
 }
 
 type AddCategoryResp struct {
@@ -41,25 +41,27 @@ func AddCategory(c *gin.Context) {
 		category := &models.Category{}
 
 		category.Name = req.Name
+		category.ID = utils.GenUniqueID()
 		category.State = models.CategoryStateNormal
 		category.AddTime = time.Now()
 		category.ModifyTime = time.Now()
 
-		result, err := category.AddCategory()
-
-		if err == nil {
-			data = map[string]string{
-				"id": result.InsertedID.(string),
-			}
+		if _, err0 := category.FindByName(category.Name); err0 == nil {
+			code = e.Success
 		} else {
-			eMsg = err.Error()
+			_, err := category.AddCategory()
+			if err == nil {
+				data = map[string]string{
+					"id": category.ID,
+				}
+				code = e.Success
+			} else {
+				code = e.Error
+				eMsg = err.Error()
+			}
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code" : code,
-			"msg" : e.GetMsg(code),
-			"error": eMsg,
-			"data" : data,
-		})
+
+		utils.Success(c, code, eMsg, data)
 	} else {
 		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
 	}

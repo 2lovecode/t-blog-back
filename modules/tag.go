@@ -5,7 +5,13 @@ import (
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
+	"t-blog-back/pkg/utils"
+	"time"
 )
+
+type AddTagReq struct {
+	Name string `form:"name" json:"name" binding:"required"`
+}
 
 func GetTagList(c *gin.Context) {
 	maps := make(map[string]interface{})
@@ -26,7 +32,36 @@ func GetTagDetail(c *gin.Context) {
 }
 
 func AddTag(c *gin.Context) {
+	var req AddTagReq
+	err := c.ShouldBindJSON(&req)
 
+	var code e.RCode
+	code = e.ErrorInvalidParams
+	eMsg := ""
+	data := make(map[string]string)
+
+	if err == nil {
+		tag := &models.Tag{}
+
+		if _, err0 := tag.FindByName(req.Name); err0 == nil {
+			utils.Success(c, code, eMsg, data)
+		} else {
+			tag.Name = req.Name
+			tag.ID = utils.GenUniqueID()
+			tag.State = models.TagStateNormal
+			tag.AddTime = time.Now()
+			tag.ModifyTime = time.Now()
+			if _, err = tag.AddTag(); err == nil {
+				data = map[string]string {
+					"id": tag.ID,
+				}
+				utils.Success(c, code, eMsg, data)
+			}
+		}
+
+	} else {
+		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
+	}
 }
 
 func EditTag(c *gin.Context) {
