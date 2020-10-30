@@ -1,30 +1,35 @@
 package modules
 
 import (
-	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
+
+	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
+// LoginReq 请求
 type LoginReq struct {
 	UserName string `form:"username" json:"username" binding:"required"`
 	PassWord string `form:"password" json:"password" binding:"required"`
 }
 
+// LoginResp 响应
 type LoginResp struct {
 	Token string `json:"token"`
 }
 
+// UserInfoResp 用户数据
 type UserInfoResp struct {
-	UId string `json:"uid"`
-	Name string `json:"name"`
+	UID    string `json:"uid"`
+	Name   string `json:"name"`
 	Avatar string `json:"avatar"`
 }
 
+// Login 登录
 func Login(c *gin.Context) {
 
 	loginReq := LoginReq{}
@@ -42,9 +47,9 @@ func Login(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"code" : code,
-			"msg" : e.GetMsg(code),
-			"data" : data,
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": data,
 		})
 	} else {
 		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
@@ -52,17 +57,18 @@ func Login(c *gin.Context) {
 
 }
 
+// UserInfo 用户信息
 func UserInfo(c *gin.Context) {
 	data := UserInfoResp{
-		UId: "abcd",
-		Name: "2lovecode",
+		UID:    "abcd",
+		Name:   "2lovecode",
 		Avatar: "/assets/images/avatar/avatar-3.jpg",
 	}
 	code := e.Success
 
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : data,
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
 	})
 }

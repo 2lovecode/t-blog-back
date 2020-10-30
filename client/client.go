@@ -2,14 +2,16 @@ package main
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"log"
 	"t-blog-back/proto/search"
+
+	"google.golang.org/grpc"
 )
 
+// PORT 端口号
 const PORT = "9001"
 
-func main () {
+func main() {
 	conn, err := grpc.Dial(":"+PORT, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("grpc.Dial err: %v", err)
@@ -27,5 +29,3 @@ func main () {
 
 	log.Printf("resp: %s", resp.GetResponse())
 }
-
-

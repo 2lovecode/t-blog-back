@@ -1,18 +1,20 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
+// Login 登录验证
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("TankBlog-Token")
 		if token == "" {
-			utils.Abort(c, http.StatusUnauthorized, e.ErrorInvalidToken, nil)
+			utils.Abort(c, http.StatusUnauthorized, e.FailureInvalidToken, nil)
 			return
 		}
 
@@ -20,7 +22,7 @@ func Login() gin.HandlerFunc {
 		u, err := user.FindUserByToken(token)
 
 		if err != nil || u.Name == "" {
-			utils.Abort(c, http.StatusUnauthorized, e.ErrorInvalidToken, nil)
+			utils.Abort(c, http.StatusUnauthorized, e.FailureInvalidToken, nil)
 			return
 		}
 
@@ -28,7 +30,7 @@ func Login() gin.HandlerFunc {
 		uInfo, err := jsonP.Marshal(&u)
 
 		if err != nil {
-			utils.Abort(c, http.StatusUnauthorized, e.ErrorInvalidToken, nil)
+			utils.Abort(c, http.StatusUnauthorized, e.FailureInvalidToken, nil)
 			return
 		}
 		c.Set("user-info", string(uInfo))

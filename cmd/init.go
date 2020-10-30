@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"t-blog-back/models"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func init() {
@@ -12,7 +13,7 @@ func init() {
 }
 
 func main() {
-	now := time.Now().Unix()
+	now := time.Now()
 
 	user := models.User{}
 	name := "admin"

@@ -1,39 +1,41 @@
 package modules
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
+// AddCategoryReq 参数验证
 type AddCategoryReq struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+// AddCategoryResp 返回
 type AddCategoryResp struct {
-
 }
 
-//分类列表
+// GetCategoryList 分类列表
 func GetCategoryList(c *gin.Context) {
 
 }
 
-//分类详情
+// GetCategoryDetail 分类详情
 func GetCategoryDetail(c *gin.Context) {
 
 }
 
-//添加分类
+// AddCategory 添加分类
 func AddCategory(c *gin.Context) {
 	var req AddCategoryReq
 	err := c.ShouldBindJSON(&req)
 
 	var code e.RCode
-	code = e.ErrorInvalidParams
+	code = e.FailureInvalidParams
 	eMsg := ""
 	data := make(map[string]string)
 
@@ -67,12 +69,12 @@ func AddCategory(c *gin.Context) {
 	}
 }
 
-//修改分类
+// EditCategory 修改分类
 func EditCategory(c *gin.Context) {
 
 }
 
-//删除分类
+// SoftDeleteCategory 删除分类
 func SoftDeleteCategory(c *gin.Context) {
 
 }

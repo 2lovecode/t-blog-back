@@ -2,26 +2,30 @@ package models
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
 	"t-blog-back/pkg/setting"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// Model 模型
 type Model struct {
 }
 
+var tankCancelFunc context.CancelFunc
 var tankDbClient *mongo.Client
-var tankDb  *mongo.Database
+var tankDb *mongo.Database
 
+// SetUp mongodb初始化
 func SetUp() {
-	dbCtx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	dbCtx, cancelFunc := context.WithTimeout(context.Background(), 10*time.Second)
 	dbClient, dbErr := mongo.Connect(dbCtx, options.Client().SetAuth(options.Credential{
-		Username:                setting.DbCfg.User,
-		Password:                setting.DbCfg.Pass,
-	}).ApplyURI(setting.DbCfg.Host))
+		Username: setting.DbCfg.User,
+		Password: setting.DbCfg.Pass,
+	}).SetConnectTimeout(3*time.Second).ApplyURI(setting.DbCfg.Host))
 
 	if dbErr != nil {
 		log.Fatalf("start error: %v", dbErr)
@@ -35,12 +39,15 @@ func SetUp() {
 
 	tankDbClient = dbClient
 	tankDb = tankDbClient.Database(setting.DbCfg.Name)
+	tankCancelFunc = cancelFunc
 }
 
+// GetDb database
 func GetDb() *mongo.Database {
 	return tankDb
 }
 
+// GetClient client
 func GetClient() *mongo.Client {
 	return tankDbClient
 }
