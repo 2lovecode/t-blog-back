@@ -27,7 +27,7 @@ type Tag struct {
 
 // Collection 标签collection
 func (tg *Tag) Collection() string {
-	return "tag"
+	return "tank_tag"
 }
 
 // AddTag 添加标签

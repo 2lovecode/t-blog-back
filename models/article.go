@@ -8,8 +8,9 @@ type ArticleList []ArticleEntry
 // ArticleEntry 文章
 type ArticleEntry struct {
 	ArticleID    int       `json:"articleID" bson:"articleID"`
-	CID          string    `json:"cid" bson:"cid"`
-	TID          string    `json:"tid" bson:"tid"`
+	CategoryID   string    `json:"category_id" bson:"category_id"`
+	TagID        string    `json:"tag_id" bson:"category_id"`
+	AuthorID     string    `json:"author_id" bson:"author_id"`
 	Title        string    `json:"title" bson:"title"`
 	Author       string    `json:"author" bson:"author"`
 	AuthorAvatar string    `json:"authorAvatar" bson:"authorAvatar"`

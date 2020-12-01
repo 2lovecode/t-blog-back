@@ -1,11 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"t-blog-back/logic/user"
 	"t-blog-back/models"
-	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func init() {
@@ -13,22 +12,7 @@ func init() {
 }
 
 func main() {
-	now := time.Now()
+	iData, err := user.InitUser(context.Background(), user.InitUserForm{})
 
-	user := models.User{}
-	name := "admin"
-	if u, e := user.FindUserByName(name); e != nil {
-		if pass, e := bcrypt.GenerateFromPassword([]byte("admin"), 16); e == nil {
-			user.Name = name
-			user.Pass = string(pass)
-			user.AddTime = now
-			user.ModifyTime = now
-
-			r, e := user.AddUser()
-			fmt.Println("result:", r)
-			fmt.Println("error:", e)
-		}
-	} else {
-		fmt.Println(u, e)
-	}
+	fmt.Println(iData, err)
 }

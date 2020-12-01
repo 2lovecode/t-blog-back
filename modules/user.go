@@ -2,25 +2,12 @@ package modules
 
 import (
 	"net/http"
-	"t-blog-back/models"
+	"t-blog-back/logic/user"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
 
 	"github.com/gin-gonic/gin"
-	uuid "github.com/satori/go.uuid"
-	"golang.org/x/crypto/bcrypt"
 )
-
-// LoginReq 请求
-type LoginReq struct {
-	UserName string `form:"username" json:"username" binding:"required"`
-	PassWord string `form:"password" json:"password" binding:"required"`
-}
-
-// LoginResp 响应
-type LoginResp struct {
-	Token string `json:"token"`
-}
 
 // UserInfoResp 用户数据
 type UserInfoResp struct {
@@ -31,29 +18,23 @@ type UserInfoResp struct {
 
 // Login 登录
 func Login(c *gin.Context) {
-
-	loginReq := LoginReq{}
-	if err := c.ShouldBindJSON(&loginReq); err == nil {
-		code := e.Success
-		user := models.User{}
-
-		data := LoginResp{}
-		if u, err := user.FindUserByName(loginReq.UserName); err == nil && bcrypt.CompareHashAndPassword([]byte(u.Pass), []byte(loginReq.PassWord)) == nil {
-			token := uuid.NewV4().String()
-			_, err = user.UpdateToken(loginReq.UserName, token)
-			data.Token = token
-		} else {
-			code = e.Error
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": data,
-		})
-	} else {
-		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
+	loginReq := user.LoginForm{}
+	if err := c.ShouldBindJSON(&loginReq); err != nil {
+		utils.FailureJSON(c, err)
+		return
 	}
+
+	resp, err := user.Login(c, loginReq)
+
+	if err == nil {
+		utils.SuccessJSON(c, resp)
+	} else {
+		utils.FailureJSON(c, err)
+	}
+}
+
+// RefreshToken 重置token
+func RefreshToken(c *gin.Context) {
 
 }
 
@@ -71,4 +52,8 @@ func UserInfo(c *gin.Context) {
 		"msg":  e.GetMsg(code),
 		"data": data,
 	})
+}
+
+func NoLoginToken(c *gin.Context) {
+
 }

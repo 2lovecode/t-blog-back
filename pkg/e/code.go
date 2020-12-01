@@ -22,6 +22,13 @@ const (
 	FailureInvalidToken = 400301
 )
 
+const (
+	// StatusSuccess 成功
+	StatusSuccess = "success"
+	// StatusFailure 失败
+	StatusFailure = "failure"
+)
+
 // MsgFlags 错误码和message对应关系
 var MsgFlags = map[RCode]string{
 	Success:                  "成功",

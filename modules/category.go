@@ -1,9 +1,7 @@
 package modules
 
 import (
-	"net/http"
 	"t-blog-back/models"
-	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
 	"time"
 
@@ -17,6 +15,7 @@ type AddCategoryReq struct {
 
 // AddCategoryResp 返回
 type AddCategoryResp struct {
+	CategoryID string `json:"categoryID"`
 }
 
 // GetCategoryList 分类列表
@@ -34,39 +33,32 @@ func AddCategory(c *gin.Context) {
 	var req AddCategoryReq
 	err := c.ShouldBindJSON(&req)
 
-	var code e.RCode
-	code = e.FailureInvalidParams
-	eMsg := ""
-	data := make(map[string]string)
-
 	if err == nil {
 		category := &models.Category{}
 
-		category.Name = req.Name
-		category.ID = utils.GenUniqueID()
-		category.State = models.CategoryStateNormal
-		category.AddTime = time.Now()
-		category.ModifyTime = time.Now()
-
-		if _, err0 := category.FindByName(category.Name); err0 == nil {
-			code = e.Success
-		} else {
-			_, err := category.AddCategory()
-			if err == nil {
-				data = map[string]string{
-					"id": category.ID,
+		if err = category.FindByName(c, req.Name); err == nil {
+			resp := AddCategoryResp{}
+			if category.IsEmpty() {
+				category.Name = req.Name
+				category.ID = utils.GenUniqueID()
+				category.State = models.CategoryStateNormal
+				category.AddTime = time.Now()
+				category.ModifyTime = time.Now()
+				_, err = category.AddCategory(c)
+				if err == nil {
+					resp.CategoryID = category.ID
 				}
-				code = e.Success
 			} else {
-				code = e.Error
-				eMsg = err.Error()
+				resp.CategoryID = category.ID
+			}
+			if err == nil && resp.CategoryID != "" {
+				utils.SuccessJSON(c, resp)
+				return
 			}
 		}
-
-		utils.Success(c, code, eMsg, data)
-	} else {
-		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
 	}
+	utils.FailureJSON(c, err)
+	return
 }
 
 // EditCategory 修改分类

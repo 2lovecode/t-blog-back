@@ -10,7 +10,7 @@ import (
 )
 
 // Login 登录验证
-func Login() gin.HandlerFunc {
+func NoLogin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("TankBlog-Token")
 		if token == "" {

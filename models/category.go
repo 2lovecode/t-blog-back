@@ -18,6 +18,7 @@ const CategoryStateBanned = 0
 // Category 分类
 type Category struct {
 	ID         string    `json:"id" bson:"id"`
+	AuthorID   string    `json:"-" bson:"authorID"`
 	Name       string    `json:"name" bson:"name"`
 	State      int8      `json:"state" bson:"state"`
 	AddTime    time.Time `json:"addTime" bson:"addTime"`
@@ -26,12 +27,12 @@ type Category struct {
 
 // Collection 分类collection
 func (cg *Category) Collection() string {
-	return "category"
+	return "tank_category"
 }
 
 // AddCategory 添加
-func (cg *Category) AddCategory() (result *mongo.InsertOneResult, e error) {
-	return GetDb().Collection(cg.Collection()).InsertOne(context.TODO(), cg)
+func (cg *Category) AddCategory(ctx context.Context) (result *mongo.InsertOneResult, e error) {
+	return GetDb().Collection(cg.Collection()).InsertOne(ctx, cg)
 }
 
 // FindByID id查询
@@ -45,11 +46,16 @@ func (cg *Category) FindByID(id string) (category Category, e error) {
 }
 
 // FindByName name查询
-func (cg *Category) FindByName(name string) (category Category, e error) {
+func (cg *Category) FindByName(ctx context.Context, name string) (e error) {
 	filter := bson.D{primitive.E{
 		Key:   "name",
 		Value: name,
 	}}
-	e = GetDb().Collection(cg.Collection()).FindOne(context.TODO(), filter).Decode(&category)
+	e = GetDb().Collection(cg.Collection()).FindOne(ctx, filter).Decode(&cg)
 	return
+}
+
+// IsEmpty 数据是否为空
+func (cg *Category) IsEmpty() bool {
+	return cg.ID == ""
 }
