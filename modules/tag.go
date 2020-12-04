@@ -40,16 +40,13 @@ func AddTag(c *gin.Context) {
 	var req AddTagReq
 	err := c.ShouldBindJSON(&req)
 
-	var code e.RCode
-	code = e.FailureInvalidParams
-	eMsg := ""
 	data := make(map[string]string)
 
 	if err == nil {
 		tag := &models.Tag{}
 
 		if _, err0 := tag.FindByName(req.Name); err0 == nil {
-			utils.Success(c, code, eMsg, data)
+			utils.SuccessJSON(c, data)
 		} else {
 			tag.Name = req.Name
 			tag.ID = utils.GenUniqueID()
@@ -60,12 +57,12 @@ func AddTag(c *gin.Context) {
 				data = map[string]string{
 					"id": tag.ID,
 				}
-				utils.Success(c, code, eMsg, data)
+				utils.SuccessJSON(c, data)
 			}
 		}
 
 	} else {
-		utils.AbortWithMessage(c, http.StatusBadRequest, e.Error, err.Error(), nil)
+		utils.FailureJSON(c, err)
 	}
 }
 

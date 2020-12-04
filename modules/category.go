@@ -20,7 +20,7 @@ type AddCategoryResp struct {
 
 // GetCategoryList 分类列表
 func GetCategoryList(c *gin.Context) {
-
+	utils.SuccessJSON(c, map[string]string{"aa": "bb"})
 }
 
 // GetCategoryDetail 分类详情

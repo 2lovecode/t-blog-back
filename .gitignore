@@ -24,3 +24,4 @@ yarn-error.log*
 *.sln
 *.sw?
 __debug_bin
+debug

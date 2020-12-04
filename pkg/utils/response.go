@@ -64,7 +64,7 @@ func FailureJSONWithHTTPCode(c *gin.Context, err error, httpCode int) {
 		c.JSON(httpCode, BodyJSON{
 			Code:      e.Failure,
 			Status:    e.StatusFailure,
-			Message:   e.GetMsg(e.Failure),
+			Message:   err.Error(),
 			Data:      nil,
 			RequestID: "",
 		})
@@ -75,34 +75,4 @@ func FailureJSONWithHTTPCode(c *gin.Context, err error, httpCode int) {
 func AbortJSON(c *gin.Context, err error, httpCode int) {
 	c.Abort()
 	FailureJSONWithHTTPCode(c, err, httpCode)
-}
-
-func Success(c *gin.Context, code e.RCode, eMsg string, data interface{}) {
-	c.JSON(http.StatusOK, gin.H{
-		"code":  code,
-		"msg":   e.GetMsg(code),
-		"error": eMsg,
-		"data":  data,
-	})
-}
-
-func Abort(c *gin.Context, httpCode int, errCode e.RCode, data interface{}) {
-	c.AbortWithStatusJSON(httpCode, gin.H{
-		"code": errCode,
-		"msg":  e.GetMsg(errCode),
-		"data": data,
-	})
-	return
-}
-
-func AbortWithMessage(c *gin.Context, httpCode int, errCode e.RCode, errMsg string, data interface{}) {
-	if errMsg == "" {
-		errMsg = e.GetMsg(errCode)
-	}
-	c.AbortWithStatusJSON(httpCode, gin.H{
-		"code": errCode,
-		"msg":  errMsg,
-		"data": data,
-	})
-	return
 }

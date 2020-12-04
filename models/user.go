@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,25 +30,27 @@ func (u *User) AddUser(ctx context.Context) (result *mongo.InsertOneResult, e er
 	return GetDb().Collection(u.Collection()).InsertOne(ctx, u)
 }
 
-// UpdateUser 添加用户
+// UpdateUser 更改用户
 func (u *User) UpdateUser(ctx context.Context) (result *mongo.UpdateResult, e error) {
-	filter := bson.D{primitive.E{
-		Key:   "name",
-		Value: u.Name,
-	}}
+	filter := bson.D{
+		bson.E{
+			Key:   "name",
+			Value: u.Name,
+		},
+	}
 	update := bson.D{
-		primitive.E{
+		bson.E{
 			Key: "$set",
 			Value: bson.D{
-				primitive.E{
+				bson.E{
 					Key:   "authorID",
 					Value: u.AuthorID,
 				},
-				primitive.E{
+				bson.E{
 					Key:   "pass",
 					Value: u.Pass,
 				},
-				primitive.E{
+				bson.E{
 					Key:   "modifyTime",
 					Value: u.ModifyTime,
 				},
@@ -61,23 +62,41 @@ func (u *User) UpdateUser(ctx context.Context) (result *mongo.UpdateResult, e er
 
 // FindUserByName 用户名查询用户
 func (u *User) FindUserByName(ctx context.Context, name string) (e error) {
-	filter := bson.D{primitive.E{
-		Key:   "name",
-		Value: name,
-	}}
+	filter := bson.D{
+		bson.E{
+			Key:   "name",
+			Value: name,
+		},
+	}
 	e = GetDb().Collection(u.Collection()).FindOne(ctx, filter).Decode(&u)
 	return
 }
 
 // FindUserByNameAndPass 用户名密码查询用户
-func (u *User) FindUserByNameAndPass(name string, pass string) (user User, e error) {
-	filter := bson.D{primitive.E{
-		Key:   "name",
-		Value: name,
-	}, primitive.E{
-		Key:   "pass",
-		Value: pass,
-	}}
-	e = GetDb().Collection(u.Collection()).FindOne(context.TODO(), filter).Decode(&user)
+func (u *User) FindUserByNameAndPass(ctx context.Context, name string, pass string) (user *User, e error) {
+	filter := bson.D{
+		bson.E{
+			Key:   "name",
+			Value: name,
+		},
+		bson.E{
+			Key:   "pass",
+			Value: pass,
+		},
+	}
+	e = GetDb().Collection(u.Collection()).FindOne(ctx, filter).Decode(&user)
+	return
+}
+
+// FindUserByAuthorID AuthorID查询用户
+func (u *User) FindUserByAuthorID(ctx context.Context, authorID string) (user *User, err error) {
+	filter := bson.D{
+		bson.E{
+			Key:   "authorID",
+			Value: authorID,
+		},
+	}
+	user = &User{}
+	err = GetDb().Collection(u.Collection()).FindOne(ctx, filter).Decode(user)
 	return
 }

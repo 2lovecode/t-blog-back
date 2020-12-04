@@ -49,6 +49,7 @@ func InitRouter() *gin.Engine {
 
 	apiFrontendV1 := r.Group("/api/v1", middleware.Cors(), auth.MiddlewareFunc())
 	{
+		apiFrontendV1.GET("/categories", modules.GetCategoryList)
 		apiFrontendV1.POST("no-login-token")
 	}
 

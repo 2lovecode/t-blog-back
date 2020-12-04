@@ -14,7 +14,6 @@ type Login struct {
 	AuthCode  string    `json:"authCode" bson:"authCode"`
 	Expire    int       `json:"expire" bson:"expire"`
 	StartTime time.Time `json:"startTime" bson:"startTime"`
-	User      User      `json:"user" bson:"user"`
 }
 
 // Collection 用户collection
@@ -23,28 +22,21 @@ func (l *Login) Collection() string {
 }
 
 // FindUserByAuthCode 通过授权码获取用户信息
-func (l *Login) FindUserByAuthCode(ctx context.Context, authCode string) (login *Login, err error) {
+func (l *Login) FindUserByAuthCode(ctx context.Context, authCode string) (user *User, err error) {
 	// 先看有没有过期
-	user := &User{}
-	pipeline := mongo.Pipeline{
-		bson.D{
-			bson.E{
-				Key: "$lookup",
-				Value: bson.D{
-					bson.E{Key: "from", Value: user.Collection()},
-					bson.E{Key: "localField", Value: "authorID"},
-					bson.E{Key: "foreignField", Value: "authorID"},
-					bson.E{Key: "as", Value: "user"},
-				},
-			},
+	res := GetDb().Collection(l.Collection()).FindOne(ctx, bson.D{
+		bson.E{
+			Key:   "authCode",
+			Value: authCode,
 		},
-	}
+	})
+	if res.Err() == nil {
+		login := &Login{}
+		res.Decode(login)
+		if login != nil && login.AuthorID != "" {
+			user, err = (&User{}).FindUserByAuthorID(ctx, login.AuthorID)
+		}
 
-	cursor, err := GetDb().Collection(l.Collection()).Aggregate(ctx, pipeline)
-
-	if cursor != nil {
-		defer cursor.Close(ctx)
-		cursor.Decode(login)
 	}
 	return
 }
