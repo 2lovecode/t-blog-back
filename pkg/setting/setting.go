@@ -1,27 +1,42 @@
 package setting
 
 import (
-	"github.com/go-ini/ini"
 	"log"
 	"time"
+
+	"github.com/go-ini/ini"
 )
 
 var (
+	// Cfg 配置实例
 	Cfg *ini.File
+	// RunMode 运行模式
 	RunMode string
+	// HTTPPort 端口号
 	HTTPPort int
+	// ReadTimeout 读超时
 	ReadTimeout time.Duration
+	// WriteTimeout 写超时
 	WriteTimeout time.Duration
+	// DbCfg 数据库配置实例
 	DbCfg DbConfig
+	// AuthCfg 认证配置实例
+	AuthCfg AuthConfig
 )
 
+// DbConfig 数据库配置
 type DbConfig struct {
-	Type string
-	User string
-	Pass string
-	Host string
-	Name string
+	Type        string
+	User        string
+	Pass        string
+	Host        string
+	Name        string
 	TablePrefix string
+}
+
+// AuthConfig 认证配置
+type AuthConfig struct {
+	SecretKey string
 }
 
 func init() {
@@ -33,12 +48,15 @@ func init() {
 	LoadBase()
 	LoadServer()
 	LoadDb()
+	LoadAuth()
 }
 
+// LoadBase 基础配置
 func LoadBase() {
 	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("debug")
 }
 
+// LoadServer 服务配置
 func LoadServer() {
 	sec, err := Cfg.GetSection("server")
 	if err != nil {
@@ -50,6 +68,7 @@ func LoadServer() {
 	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
 }
 
+// LoadDb 数据库配置
 func LoadDb() {
 	sec, err := Cfg.GetSection("database")
 	if err != nil {
@@ -61,4 +80,13 @@ func LoadDb() {
 	DbCfg.Pass = sec.Key("PASS").MustString("root")
 	DbCfg.Name = sec.Key("NAME").MustString("blog")
 	DbCfg.TablePrefix = sec.Key("TABLE_PREFIX").MustString("blog_")
+}
+
+// LoadAuth 认证配置
+func LoadAuth() {
+	sec, err := Cfg.GetSection("auth")
+	if err != nil {
+		log.Fatalf("Fail to get section 'auth': %v", err)
+	}
+	AuthCfg.SecretKey = sec.Key("SECRET_KEY").MustString("secret_key")
 }

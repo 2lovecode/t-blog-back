@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"t-blog-back/models"
 	"t-blog-back/pkg/utils"
 	"time"
@@ -25,9 +26,7 @@ func Login(ctx context.Context, loginForm LoginForm) (lData LoginData, err error
 	user := models.User{}
 	if err = user.FindUserByName(ctx, loginForm.UserName); err == nil && bcrypt.CompareHashAndPassword([]byte(user.Pass), []byte(loginForm.PassWord)) == nil {
 		token := utils.GenToken()
-		if _, err = user.UpdateToken(ctx, token); err == nil {
-			lData.Token = token
-		}
+		fmt.Println(token)
 	}
 	return
 }

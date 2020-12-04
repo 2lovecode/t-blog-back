@@ -18,12 +18,14 @@ replace (
 )
 
 require (
+	github.com/appleboy/gin-jwt v2.5.0+incompatible
+	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/astaxie/beego v1.12.1
-	github.com/gin-gonic/gin v1.5.0
+	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ini/ini v1.52.0
 	github.com/golang/protobuf v1.4.2
-	github.com/json-iterator/go v1.1.7
-	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
+	github.com/json-iterator/go v1.1.9
+	github.com/modern-go/reflect2 v1.0.1
 	github.com/rs/xid v1.2.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2
@@ -36,5 +38,6 @@ require (
 	google.golang.org/genproto v0.0.0-20200709005830-7a2ca40e9dc3 // indirect
 	google.golang.org/grpc v1.30.0
 	google.golang.org/protobuf v1.25.0
+	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
 	gopkg.in/ini.v1 v1.55.0 // indirect
 )

@@ -5,17 +5,16 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Login 登录记录
 type Login struct {
-	AuthorID string    `json:"-" bson:"authorID"`
-	Token    string    `json:"token" bson:"token"`
-	Expire   int       `json:"expire" bson:"expire"`
-	AddTime  time.Time `json:"addTime" bson:"addTime"`
-	User     User      `json:"user" bson:"user"`
+	AuthorID  string    `json:"-" bson:"authorID"`
+	AuthCode  string    `json:"authCode" bson:"authCode"`
+	Expire    int       `json:"expire" bson:"expire"`
+	StartTime time.Time `json:"startTime" bson:"startTime"`
+	User      User      `json:"user" bson:"user"`
 }
 
 // Collection 用户collection
@@ -23,19 +22,19 @@ func (l *Login) Collection() string {
 	return "tank_login"
 }
 
-// FindUserByToken 通过token获取用户信息
-func (l *Login) FindUserByToken(ctx context.Context, token string) (user *User, err error) {
-	user = &User{}
-	login := Login{}
+// FindUserByAuthCode 通过授权码获取用户信息
+func (l *Login) FindUserByAuthCode(ctx context.Context, authCode string) (login *Login, err error) {
+	// 先看有没有过期
+	user := &User{}
 	pipeline := mongo.Pipeline{
 		bson.D{
-			primitive.E{
+			bson.E{
 				Key: "$lookup",
 				Value: bson.D{
-					primitive.E{Key: "from", Value: user.Collection()},
-					primitive.E{Key: "localField", Value: "authorID"},
-					primitive.E{Key: "foreignField", Value: "authorID"},
-					primitive.E{Key: "as", Value: "user"},
+					bson.E{Key: "from", Value: user.Collection()},
+					bson.E{Key: "localField", Value: "authorID"},
+					bson.E{Key: "foreignField", Value: "authorID"},
+					bson.E{Key: "as", Value: "user"},
 				},
 			},
 		},
@@ -43,62 +42,54 @@ func (l *Login) FindUserByToken(ctx context.Context, token string) (user *User, 
 
 	cursor, err := GetDb().Collection(l.Collection()).Aggregate(ctx, pipeline)
 
-	cursor.Decode(&login)
-
-	defer cursor.Close(ctx)
-
+	if cursor != nil {
+		defer cursor.Close(ctx)
+		cursor.Decode(login)
+	}
 	return
 }
 
 // FindLoginByAuthorID 查找
 func (l *Login) FindLoginByAuthorID(ctx context.Context, authorID string) (login *Login, err error) {
-	filter := bson.D{primitive.E{
+	filter := bson.D{bson.E{
 		Key:   "authorID",
-		Value: l.AuthorID,
+		Value: authorID,
 	}}
 	cursor, err := GetDb().Collection(l.Collection()).Find(ctx, filter)
-	cursor.Decode(login)
+	if cursor != nil {
+		defer cursor.Close(ctx)
+		cursor.Decode(login)
+	}
 	return
 }
 
-// UpdateToken 更新token
-func (l *Login) CreateLogin(ctx context.Context, token string) (result *mongo.UpdateResult, err error) {
+// AddLogin 添加
+func (l *Login) AddLogin(ctx context.Context) (result *mongo.InsertOneResult, err error) {
+	return GetDb().Collection(l.Collection()).InsertOne(ctx, l)
+}
+
+// UpdateLoginAuthCode 更新授权码
+func (l *Login) UpdateLoginAuthCode(ctx context.Context, authorCode string) (result *mongo.UpdateResult, err error) {
 	login := &Login{}
-	filter := bson.D{primitive.E{
+	filter := bson.D{bson.E{
 		Key:   "authorID",
 		Value: l.AuthorID,
 	}}
 	update := bson.D{
-		primitive.E{
+		bson.E{
 			Key: "$set",
-			Value: bson.D{primitive.E{
-				Key:   "token",
-				Value: token,
-			},
+			Value: bson.D{
+				bson.E{
+					Key:   "authCode",
+					Value: authorCode,
+				},
+				bson.E{
+					Key:   "startTime",
+					Value: time.Now(),
+				},
 			},
 		},
 	}
-	_, err = GetDb().Collection(login.Collection()).UpdateOne(ctx, filter, update)
-	return
-}
-
-// UpdateToken 更新token
-func (l *Login) UpdateToken(ctx context.Context, token string) (result *mongo.UpdateResult, err error) {
-	login := &Login{}
-	filter := bson.D{primitive.E{
-		Key:   "authorID",
-		Value: l.AuthorID,
-	}}
-	update := bson.D{
-		primitive.E{
-			Key: "$set",
-			Value: bson.D{primitive.E{
-				Key:   "token",
-				Value: token,
-			},
-			},
-		},
-	}
-	_, err = GetDb().Collection(login.Collection()).UpdateOne(ctx, filter, update)
+	result, err = GetDb().Collection(login.Collection()).UpdateOne(ctx, filter, update)
 	return
 }

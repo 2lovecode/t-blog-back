@@ -1,12 +1,16 @@
 package routers
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"t-blog-back/middleware"
 	"t-blog-back/modules"
 	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/setting"
+	"t-blog-back/pkg/utils"
 
+	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,11 +32,22 @@ func InitRouter() *gin.Engine {
 		})
 	})
 
-	r.POST("/api/no-login-token", modules.NoLoginToken)
-	r.POST("/api/login", modules.Login)
-	r.POST("/api/refresh-token", modules.RefreshToken)
+	// r.POST("/api/no-login-token", modules.NoLoginToken)
+	// r.POST("/api/login", modules.Login)
+	// r.POST("/api/refresh-token", modules.RefreshToken)
 
-	apiFrontendV1 := r.Group("/api/v1", middleware.Cors(), middleware.Login())
+	auth, _ := middleware.NewAuthMiddleware()
+
+	r.POST("/api/login", auth.LoginHandler)
+	r.GET("/api/refresh_token", auth.RefreshHandler)
+
+	r.NoRoute(auth.MiddlewareFunc(), func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		msg := fmt.Sprintf("NoRoute claims: %#v\n", claims)
+		utils.FailureJSONWithHTTPCode(c, errors.New(msg), http.StatusNotFound)
+	})
+
+	apiFrontendV1 := r.Group("/api/v1", middleware.Cors(), auth.MiddlewareFunc())
 	{
 		apiFrontendV1.POST("no-login-token")
 	}
