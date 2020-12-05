@@ -36,9 +36,9 @@ func AddCategory(c *gin.Context) {
 	if err == nil {
 		category := &models.Category{}
 
-		if err = category.FindByName(c, req.Name); err == nil {
+		if cg, err := category.FindByName(c, req.Name); err == nil {
 			resp := AddCategoryResp{}
-			if category.IsEmpty() {
+			if cg.IsEmpty() {
 				category.Name = req.Name
 				category.ID = utils.GenUniqueID()
 				category.State = models.CategoryStateNormal

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,6 +19,7 @@ type Category struct {
 	ID         string    `json:"id" bson:"id"`
 	AuthorID   string    `json:"-" bson:"authorID"`
 	Name       string    `json:"name" bson:"name"`
+	Desc       string    `json:"desc" bson:"desc"`
 	State      int8      `json:"state" bson:"state"`
 	AddTime    time.Time `json:"addTime" bson:"addTime"`
 	ModifyTime time.Time `json:"modifyTime" bson:"modifyTime"`
@@ -37,25 +37,43 @@ func (cg *Category) AddCategory(ctx context.Context) (result *mongo.InsertOneRes
 
 // FindByID id查询
 func (cg *Category) FindByID(id string) (category Category, e error) {
-	filter := bson.D{primitive.E{
-		Key:   "id",
-		Value: id,
-	}}
+	filter := bson.D{
+		bson.E{
+			Key:   "id",
+			Value: id,
+		},
+	}
 	e = GetDb().Collection(cg.Collection()).FindOne(context.TODO(), filter).Decode(&category)
 	return
 }
 
 // FindByName name查询
-func (cg *Category) FindByName(ctx context.Context, name string) (e error) {
-	filter := bson.D{primitive.E{
-		Key:   "name",
-		Value: name,
-	}}
-	e = GetDb().Collection(cg.Collection()).FindOne(ctx, filter).Decode(&cg)
+func (cg *Category) FindByName(ctx context.Context, name string) (category Category, e error) {
+	filter := bson.D{
+		bson.E{
+			Key:   "name",
+			Value: name,
+		},
+	}
+	e = GetDb().Collection(cg.Collection()).FindOne(ctx, filter).Decode(&category)
 	return
 }
 
 // IsEmpty 数据是否为空
 func (cg *Category) IsEmpty() bool {
 	return cg.ID == ""
+}
+
+// FindAll 返回所有分类
+func (cg *Category) FindAll(ctx context.Context) (categories []Category, err error) {
+	filter := bson.D{}
+
+	cursor, err := GetDb().Collection(cg.Collection()).Find(ctx, filter)
+	if cursor != nil {
+		for cursor.Next(ctx) {
+			cursor.Decode(categories)
+		}
+	}
+
+	return
 }

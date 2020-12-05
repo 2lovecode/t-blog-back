@@ -47,13 +47,14 @@ func InitRouter() *gin.Engine {
 		utils.FailureJSONWithHTTPCode(c, errors.New(msg), http.StatusNotFound)
 	})
 
-	apiFrontendV1 := r.Group("/api/v1", middleware.Cors(), auth.MiddlewareFunc())
+	apiFrontendV1 := r.Group("/api/v1", middleware.Cors())
 	{
+		apiFrontendV1.GET("/info", modules.GetCategoryList)
 		apiFrontendV1.GET("/categories", modules.GetCategoryList)
 		apiFrontendV1.POST("no-login-token")
 	}
 
-	apiBackendV1 := r.Group("/api/backend/v1", middleware.Login())
+	apiBackendV1 := r.Group("/api/backend/v1", auth.MiddlewareFunc())
 	{
 		//分类
 		apiBackendV1.GET("/categories", modules.GetCategoryList)
