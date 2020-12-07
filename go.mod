@@ -22,22 +22,24 @@ require (
 	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/astaxie/beego v1.12.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/go-ini/ini v1.52.0
+	github.com/go-ini/ini v1.62.0
 	github.com/golang/protobuf v1.4.2
-	github.com/json-iterator/go v1.1.9
+	github.com/json-iterator/go v1.1.10
+	github.com/minio/minio-go v6.0.14+incompatible // indirect
+	github.com/minio/minio-go/v7 v7.0.6
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/reflect2 v1.0.1
 	github.com/rs/xid v1.2.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.7.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	go.mongodb.org/mongo-driver v1.3.1
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
-	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
-	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
+	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb // indirect
+	golang.org/x/sys v0.0.0-20201204225414-ed752295db88 // indirect
+	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/genproto v0.0.0-20200709005830-7a2ca40e9dc3 // indirect
 	google.golang.org/grpc v1.30.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
-	gopkg.in/ini.v1 v1.55.0 // indirect
 )

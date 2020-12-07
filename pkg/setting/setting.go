@@ -2,6 +2,7 @@ package setting
 
 import (
 	"log"
+	"strings"
 	"time"
 
 	"github.com/go-ini/ini"
@@ -22,6 +23,8 @@ var (
 	DbCfg DbConfig
 	// AuthCfg 认证配置实例
 	AuthCfg AuthConfig
+	// StorageCfg 存储配置
+	StorageCfg StorageConfig
 )
 
 // DbConfig 数据库配置
@@ -39,6 +42,15 @@ type AuthConfig struct {
 	SecretKey string
 }
 
+// StorageConfig 存储配置
+type StorageConfig struct {
+	Endpoint   string
+	AccessKey  string
+	SecretKey  string
+	UseSSL     bool
+	BucketName string
+}
+
 func init() {
 	var err error
 	Cfg, err = ini.Load("conf/app.ini")
@@ -49,6 +61,7 @@ func init() {
 	LoadServer()
 	LoadDb()
 	LoadAuth()
+	LoadStorage()
 }
 
 // LoadBase 基础配置
@@ -89,4 +102,23 @@ func LoadAuth() {
 		log.Fatalf("Fail to get section 'auth': %v", err)
 	}
 	AuthCfg.SecretKey = sec.Key("SECRET_KEY").MustString("secret_key")
+}
+
+// LoadStorage 存储配置
+func LoadStorage() {
+	sec, err := Cfg.GetSection("storage")
+	if err != nil {
+		log.Fatalf("Fail to get section 'storage': %v", err)
+	}
+	endpoints := sec.Key("ENDPOINTS").MustString("Q3AM3UQ867SPQQA43P2F:tfteSlswRu7BJ86wekitnifILbZam1KYY3TG@play.min.io")
+	endpointsL := strings.Split(endpoints, "@")
+	if len(endpointsL) < 3 {
+		log.Fatalf("endpoints config error %v", err)
+	} else {
+		StorageCfg.Endpoint = endpointsL[0]
+		StorageCfg.AccessKey = endpointsL[1]
+		StorageCfg.SecretKey = endpointsL[2]
+	}
+	StorageCfg.UseSSL = sec.Key("USE_SSL").MustBool(false)
+	StorageCfg.BucketName = sec.Key("BUCKET_NAME").MustString("tank-blog")
 }

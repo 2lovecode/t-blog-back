@@ -32,10 +32,6 @@ func InitRouter() *gin.Engine {
 		})
 	})
 
-	// r.POST("/api/no-login-token", modules.NoLoginToken)
-	// r.POST("/api/login", modules.Login)
-	// r.POST("/api/refresh-token", modules.RefreshToken)
-
 	auth, _ := middleware.NewAuthMiddleware()
 
 	r.POST("/api/login", auth.LoginHandler)
@@ -49,9 +45,14 @@ func InitRouter() *gin.Engine {
 
 	apiFrontendV1 := r.Group("/api/v1", middleware.Cors())
 	{
-		apiFrontendV1.GET("/info", modules.GetCategoryList)
+		// app详情
+		apiFrontendV1.GET("/about", modules.About)
+		// 文章列表
+		apiFrontendV1.GET("/article-list", modules.GetArticleList)
+		// 文章详情
+		apiFrontendV1.GET("/article-detail", modules.GetArticleDetail)
+		// 分类列表
 		apiFrontendV1.GET("/categories", modules.GetCategoryList)
-		apiFrontendV1.POST("no-login-token")
 	}
 
 	apiBackendV1 := r.Group("/api/backend/v1", auth.MiddlewareFunc())
