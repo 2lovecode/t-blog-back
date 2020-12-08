@@ -23,8 +23,10 @@ func SetUp() {
 		Secure: false,
 	})
 	if err != nil {
-		logging.Tlog.Errorln(err)
+		logging.Tlog.Fatalln(err)
 	}
+
+	// minioClient.SetBucketPolicy(context.TODO(), setting.StorageCfg.BucketName, "public")
 
 	logging.Tlog.Printf("%#v\n", minioClient) // minioClient初使化成功
 }
