@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"t-blog-back/logic/category"
 	"t-blog-back/models"
 	"t-blog-back/pkg/utils"
 	"time"
@@ -20,7 +21,13 @@ type AddCategoryResp struct {
 
 // GetCategoryList 分类列表
 func GetCategoryList(c *gin.Context) {
-	utils.SuccessJSON(c, map[string]string{"aa": "bb"})
+	cgs, err := category.CategoryList(c)
+	if err == nil {
+		utils.SuccessJSON(c, cgs)
+	} else {
+		utils.FailureJSON(c, err)
+	}
+
 }
 
 // GetCategoryDetail 分类详情
@@ -32,29 +39,26 @@ func GetCategoryDetail(c *gin.Context) {
 func AddCategory(c *gin.Context) {
 	var req AddCategoryReq
 	err := c.ShouldBindJSON(&req)
-
 	if err == nil {
 		category := &models.Category{}
-
-		if cg, err := category.FindByName(c, req.Name); err == nil {
-			resp := AddCategoryResp{}
-			if cg.IsEmpty() {
-				category.Name = req.Name
-				category.ID = utils.GenUniqueID()
-				category.State = models.CategoryStateNormal
-				category.AddTime = time.Now()
-				category.ModifyTime = time.Now()
-				_, err = category.AddCategory(c)
-				if err == nil {
-					resp.CategoryID = category.ID
-				}
-			} else {
+		category.FindByName(c, req.Name)
+		resp := AddCategoryResp{}
+		if category.IsEmpty() {
+			category.Name = req.Name
+			category.ID = utils.GenUniqueID()
+			category.State = models.CategoryStateNormal
+			category.AddTime = time.Now()
+			category.ModifyTime = time.Now()
+			_, err = category.AddCategory(c)
+			if err == nil {
 				resp.CategoryID = category.ID
 			}
-			if err == nil && resp.CategoryID != "" {
-				utils.SuccessJSON(c, resp)
-				return
-			}
+		} else {
+			resp.CategoryID = category.ID
+		}
+		if err == nil && resp.CategoryID != "" {
+			utils.SuccessJSON(c, resp)
+			return
 		}
 	}
 	utils.FailureJSON(c, err)

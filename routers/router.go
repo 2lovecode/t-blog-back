@@ -10,7 +10,7 @@ import (
 	"t-blog-back/pkg/setting"
 	"t-blog-back/pkg/utils"
 
-	jwt "github.com/appleboy/gin-jwt"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,7 +52,7 @@ func InitRouter() *gin.Engine {
 		// 文章详情
 		apiFrontendV1.GET("/article-detail", modules.GetArticleDetail)
 		// 分类列表
-		apiFrontendV1.GET("/categories", modules.GetCategoryList)
+		apiFrontendV1.GET("/category-list", modules.GetCategoryList)
 	}
 
 	apiBackendV1 := r.Group("/api/backend/v1", auth.MiddlewareFunc())
@@ -60,7 +60,7 @@ func InitRouter() *gin.Engine {
 		//分类
 		apiBackendV1.GET("/categories", modules.GetCategoryList)
 		apiBackendV1.GET("/category/:id", modules.GetCategoryDetail)
-		apiBackendV1.POST("/category", modules.AddCategory)
+		apiBackendV1.POST("/add-category", modules.AddCategory)
 		apiBackendV1.PUT("/category/:id", modules.EditCategory)
 		apiBackendV1.DELETE("/category/:id", modules.SoftDeleteCategory)
 

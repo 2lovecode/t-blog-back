@@ -48,14 +48,14 @@ func (cg *Category) FindByID(id string) (category Category, e error) {
 }
 
 // FindByName name查询
-func (cg *Category) FindByName(ctx context.Context, name string) (category Category, e error) {
+func (cg *Category) FindByName(ctx context.Context, name string) (err error) {
 	filter := bson.D{
 		bson.E{
 			Key:   "name",
 			Value: name,
 		},
 	}
-	e = GetDb().Collection(cg.Collection()).FindOne(ctx, filter).Decode(&category)
+	err = GetDb().Collection(cg.Collection()).FindOne(ctx, filter).Decode(cg)
 	return
 }
 
@@ -71,9 +71,10 @@ func (cg *Category) FindAll(ctx context.Context) (categories []Category, err err
 	cursor, err := GetDb().Collection(cg.Collection()).Find(ctx, filter)
 	if cursor != nil {
 		for cursor.Next(ctx) {
-			cursor.Decode(categories)
+			category := Category{}
+			cursor.Decode(&category)
+			categories = append(categories, category)
 		}
 	}
-
 	return
 }

@@ -11,6 +11,7 @@ type AboutAuthor struct {
 	Name    string `json:"name"`
 	Avatar  string `json:"avatar"`
 	Email   string `json:"email"`
+	Github  string `json:"github"`
 	Intro   string `json:"intro"`
 	Article int    `json:"article"`
 }
@@ -21,6 +22,7 @@ func About(ctx *gin.Context) {
 		Name:    "2lovecode",
 		Avatar:  "http://www.2lovecode.com:9999/tank-blog/avatar/avatar-1.jpg",
 		Email:   "liu546hao@163.com",
+		Github:  "https://github.com/2lovecode",
 		Intro:   "搞点事情～",
 		Article: 0,
 	})

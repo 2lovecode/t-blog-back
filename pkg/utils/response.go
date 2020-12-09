@@ -61,10 +61,14 @@ func FailureJSONWithHTTPCode(c *gin.Context, err error, httpCode int) {
 			RequestID: "",
 		})
 	} else {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
 		c.JSON(httpCode, BodyJSON{
 			Code:      e.Failure,
 			Status:    e.StatusFailure,
-			Message:   err.Error(),
+			Message:   msg,
 			Data:      nil,
 			RequestID: "",
 		})
