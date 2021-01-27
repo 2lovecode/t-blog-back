@@ -18,10 +18,11 @@ type AddTagReq struct {
 // GetTagList 获取标签列表
 func GetTagList(c *gin.Context) {
 	maps := make(map[string]interface{})
-	data := make(map[string]interface{})
 	code := e.Success
 
-	data["lists"] = models.GetTags(c, 1, 2, maps)
+	tag := &models.Tag{}
+
+	data := tag.GetTags(c, 1, 10, maps)
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
@@ -53,7 +54,7 @@ func AddTag(c *gin.Context) {
 			tag.State = models.TagStateNormal
 			tag.AddTime = time.Now()
 			tag.ModifyTime = time.Now()
-			if _, err = tag.AddTag(); err == nil {
+			if _, err = tag.AddTag(c); err == nil {
 				data = map[string]string{
 					"id": tag.ID,
 				}

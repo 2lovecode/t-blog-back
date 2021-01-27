@@ -43,7 +43,7 @@ func InitRouter() *gin.Engine {
 		utils.FailureJSONWithHTTPCode(c, errors.New(msg), http.StatusNotFound)
 	})
 
-	apiFrontendV1 := r.Group("/api/v1", middleware.Cors())
+	apiFrontendV1 := r.Group("/api/v1")
 	{
 		// app详情
 		apiFrontendV1.GET("/about", modules.About)
@@ -52,18 +52,11 @@ func InitRouter() *gin.Engine {
 		// 文章详情
 		apiFrontendV1.GET("/article-detail", modules.GetArticleDetail)
 		// 分类列表
-		apiFrontendV1.GET("/category-list", modules.GetCategoryList)
+		apiFrontendV1.GET("/tag-list", modules.GetTagList)
 	}
 
 	apiBackendV1 := r.Group("/api/backend/v1", auth.MiddlewareFunc())
 	{
-		//分类
-		apiBackendV1.GET("/categories", modules.GetCategoryList)
-		apiBackendV1.GET("/category/:id", modules.GetCategoryDetail)
-		apiBackendV1.POST("/add-category", modules.AddCategory)
-		apiBackendV1.PUT("/category/:id", modules.EditCategory)
-		apiBackendV1.DELETE("/category/:id", modules.SoftDeleteCategory)
-
 		//标签
 		apiBackendV1.GET("/tags", modules.GetTagList)
 		apiBackendV1.GET("/tag/:id", modules.GetTagDetail)

@@ -41,7 +41,7 @@ func SuccessJSONWithMessage(c *gin.Context, msg string, data interface{}) {
 
 // FailureJSON 失败返回
 func FailureJSON(c *gin.Context, err error) {
-	FailureJSONWithHTTPCode(c, err, http.StatusInternalServerError)
+	FailureJSONWithHTTPCode(c, err, http.StatusBadRequest)
 }
 
 // FailureJSONWithHTTPCode 失败返回

@@ -2,7 +2,8 @@ package models
 
 import (
 	"context"
-	"fmt"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,8 +32,8 @@ func (tg *Tag) Collection() string {
 }
 
 // AddTag 添加标签
-func (tg *Tag) AddTag() (result *mongo.InsertOneResult, e error) {
-	return GetDb().Collection(tg.Collection()).InsertOne(context.TODO(), tg)
+func (tg *Tag) AddTag(ctx context.Context) (result *mongo.InsertOneResult, e error) {
+	return GetDb().Collection(tg.Collection()).InsertOne(ctx, tg)
 }
 
 // FindByID id查询
@@ -56,10 +57,27 @@ func (tg *Tag) FindByName(name string) (tag Tag, e error) {
 }
 
 // GetTags 获取标签
-func GetTags(ctx context.Context, pageNum int, pageSize int, maps interface{}) (tag Tag) {
-	collection := tankDb.Collection("tag")
-	res, _ := collection.InsertOne(ctx, bson.M{"name": "pi", "value": 3.14159})
-	fmt.Println(res)
-	tag = Tag{State: 12}
+func (tg *Tag)GetTags(ctx context.Context, pageNum int, pageSize int, maps interface{}) (tags []Tag) {
+	filter := bson.D{primitive.E{}}
+	findOptions := options.Find()
+	findOptions.SetLimit(int64(pageSize))
+
+	collection :=  GetDb().Collection(tg.Collection())
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err == nil {
+		for cursor.Next(ctx) {
+			// 创建一个值，将单个文档解码为该值
+			var elem Tag
+			e := cursor.Decode(&elem)
+			if e == nil {
+				tags = append(tags, elem)
+			}
+
+		}
+
+		if err := cursor.Err(); err != nil {
+			log.Fatal(err)
+		}
+	}
 	return
 }
