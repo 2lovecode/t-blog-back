@@ -2,8 +2,8 @@ package models
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"t-blog-back/pkg/utils"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -37,47 +37,48 @@ func (tg *Tag) AddTag(ctx context.Context) (result *mongo.InsertOneResult, e err
 }
 
 // FindByID id查询
-func (tg *Tag) FindByID(id string) (tag Tag, e error) {
+func (tg *Tag) FindByID(ctx context.Context, id string) (tag Tag, e error) {
 	filter := bson.D{primitive.E{
 		Key:   "id",
 		Value: id,
 	}}
-	e = GetDb().Collection(tg.Collection()).FindOne(context.TODO(), filter).Decode(&tag)
+	e = GetDb().Collection(tg.Collection()).FindOne(ctx, filter).Decode(&tag)
 	return
 }
 
 // FindByName name查询
-func (tg *Tag) FindByName(name string) (tag Tag, e error) {
+func (tg *Tag) FindByName(ctx context.Context, name string) (tag Tag, e error) {
 	filter := bson.D{primitive.E{
 		Key:   "name",
 		Value: name,
 	}}
-	e = GetDb().Collection(tg.Collection()).FindOne(context.TODO(), filter).Decode(&tag)
+	e = GetDb().Collection(tg.Collection()).FindOne(ctx, filter).Decode(&tag)
 	return
 }
 
 // GetTags 获取标签
-func (tg *Tag)GetTags(ctx context.Context, pageNum int, pageSize int, maps interface{}) (tags []Tag) {
-	filter := bson.D{primitive.E{}}
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(pageSize))
-
+func (tg *Tag)GetTags(ctx context.Context, page *utils.Pagination, filter bson.D) (tags []Tag, err error) {
 	collection :=  GetDb().Collection(tg.Collection())
-	cursor, err := collection.Find(ctx, filter, findOptions)
-	if err == nil {
-		for cursor.Next(ctx) {
-			// 创建一个值，将单个文档解码为该值
-			var elem Tag
-			e := cursor.Decode(&elem)
-			if e == nil {
-				tags = append(tags, elem)
+	cnt, err := collection.CountDocuments(ctx, filter)
+
+	if err == nil && cnt > 0 {
+		findOptions := page.GetFindOptions()
+		cursor, err := collection.Find(ctx, filter, findOptions)
+		if err == nil {
+			for cursor.Next(ctx) {
+				// 创建一个值，将单个文档解码为该值
+				var elem Tag
+				e := cursor.Decode(&elem)
+				if e == nil {
+					tags = append(tags, elem)
+				}
 			}
 
+			if err = cursor.Err(); err != nil {
+				log.Fatal(err)
+			}
 		}
-
-		if err := cursor.Err(); err != nil {
-			log.Fatal(err)
-		}
+		page.SetTotal(cnt)
 	}
 	return
 }

@@ -3,10 +3,9 @@ package models
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"t-blog-back/pkg/utils"
 	"time"
 )
 
@@ -33,28 +32,32 @@ func (at *Article) Collection() string {
 }
 
 // GetArticleList 文章列表
-func (at *Article) GetArticles(ctx context.Context, pageNum int, pageSize int, maps map[string]interface{}) (articles []Article) {
-	filter := bson.D{primitive.E{}}
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(pageSize))
-
+func (at *Article) GetArticles(ctx context.Context, page *utils.Pagination, filter bson.D) (articles []Article) {
 	collection :=  GetDb().Collection(at.Collection())
-	cursor, err := collection.Find(ctx, filter, findOptions)
-	if err == nil {
-		for cursor.Next(ctx) {
-			// 创建一个值，将单个文档解码为该值
-			var elem Article
-			e := cursor.Decode(&elem)
-			if e == nil {
-				articles = append(articles, elem)
+
+	cnt, err := collection.CountDocuments(ctx, filter)
+
+	if err == nil && cnt > 0 {
+		findOptions := page.GetFindOptions()
+		cursor, err := collection.Find(ctx, filter, findOptions)
+		if err == nil {
+			for cursor.Next(ctx) {
+				// 创建一个值，将单个文档解码为该值
+				var elem Article
+				e := cursor.Decode(&elem)
+				if e == nil {
+					articles = append(articles, elem)
+				}
+
 			}
 
+			if err := cursor.Err(); err != nil {
+				log.Fatal(err)
+			}
 		}
-
-		if err := cursor.Err(); err != nil {
-			log.Fatal(err)
-		}
+		page.SetTotal(cnt)
 	}
+
 	return
 }
 

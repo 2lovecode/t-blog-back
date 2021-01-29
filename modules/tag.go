@@ -1,9 +1,8 @@
 package modules
 
 import (
-	"net/http"
+	"go.mongodb.org/mongo-driver/bson"
 	"t-blog-back/models"
-	"t-blog-back/pkg/e"
 	"t-blog-back/pkg/utils"
 	"time"
 
@@ -15,20 +14,41 @@ type AddTagReq struct {
 	Name string `form:"name" json:"name" binding:"required"`
 }
 
+type TagListReq struct {
+	Page int64		`form:"pageNum" json:"page"`
+	PageSize int64	`form:"pageSize" json:"pageSize"`
+}
+
+type TagListResp struct {
+	Page utils.PaginationData `json:"pagination"`
+	List []models.Tag `json:"list"`
+}
+
 // GetTagList 获取标签列表
 func GetTagList(c *gin.Context) {
-	maps := make(map[string]interface{})
-	code := e.Success
-
 	tag := &models.Tag{}
+	tagReq := TagListReq{}
 
-	data := tag.GetTags(c, 1, 10, maps)
+	err := c.ShouldBindQuery(&tagReq)
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": data,
-	})
+	if err == nil {
+		pagination := utils.NewPagination(10)
+		pagination.SetPage(tagReq.Page)
+		pagination.SetSize(tagReq.PageSize)
+		data, err := tag.GetTags(c, pagination, bson.D{})
+
+		pageData := pagination.GetPaginationData()
+
+		if err == nil {
+			utils.SuccessJSON(c, TagListResp{
+				Page: pageData,
+				List: data,
+			})
+			return
+		}
+	}
+
+	utils.FailureJSON(c, err)
 }
 
 // GetTagDetail 获取详情
@@ -46,7 +66,7 @@ func AddTag(c *gin.Context) {
 	if err == nil {
 		tag := &models.Tag{}
 
-		if _, err0 := tag.FindByName(req.Name); err0 == nil {
+		if _, err0 := tag.FindByName(c, req.Name); err0 == nil {
 			utils.SuccessJSON(c, data)
 		} else {
 			tag.Name = req.Name

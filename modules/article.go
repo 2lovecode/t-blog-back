@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"t-blog-back/models"
 	"t-blog-back/pkg/e"
@@ -18,30 +19,70 @@ type AddArticleReq struct {
 	Tags         []string  `form:"tags" json:"tags" binding:"required"`
 }
 
+
+type ArticleListReq struct {
+	Page int64		`form:"pageNum" json:"page"`
+	PageSize int64	`form:"pageSize" json:"pageSize"`
+	TagID string	`form:"tagID" json:"tagID"`
+}
+
+type ArticleListResp struct {
+	Page utils.PaginationData `json:"pagination"`
+	TagID string `json:"tagID,omitempty"`
+	TagName string `json:"tagName,omitempty"`
+	List []models.Article `json:"list"`
+}
+
 // GetArticleList 获取列表
 func GetArticleList(c *gin.Context) {
-	article := &models.Article{}
+	articleListReq := ArticleListReq{}
 
-	articleList := article.GetArticles(c, 1, 10, nil)
+	err := c.ShouldBindQuery(&articleListReq)
 
-	code := e.Success
+	if err == nil {
+		article := &models.Article{}
+		tagName := ""
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": articleList,
-	})
+		filter := bson.D{}
+
+		if articleListReq.TagID != "" {
+			filter = append(filter, bson.E{
+				Key: "tagID",
+				Value: articleListReq.TagID,
+			})
+			tag := &models.Tag{}
+			t, _ := tag.FindByID(c, articleListReq.TagID)
+			tagName = t.Name
+		}
+
+		pagination := utils.NewPagination(10)
+		pagination.SetPage(articleListReq.Page)
+		pagination.SetSize(articleListReq.PageSize)
+
+		articleList := article.GetArticles(c, pagination, filter)
+
+		pageData := pagination.GetPaginationData()
+
+		utils.SuccessJSON(c, ArticleListResp{
+			Page:     pageData,
+			TagID:    articleListReq.TagID,
+			TagName:  tagName,
+			List:     articleList,
+		})
+	} else {
+		utils.FailureJSON(c, err)
+	}
+
 }
 
 // GetArticleDetail 获取文章详情
 func GetArticleDetail(c *gin.Context) {
 	code := e.Success
 
-	user, _ := utils.GetLoginUserInfo(c)
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": user,
+		"data": nil,
 	})
 }
 
