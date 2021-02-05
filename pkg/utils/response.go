@@ -14,7 +14,7 @@ type BodyJSON struct {
 	Code      e.RCode     `json:"code" example:"200"`
 	Message   string      `json:"msg" example:"成功"`
 	Data      interface{} `json:"data"`
-	RequestID string      `json:"request_id" example:"buckkbuvvhfijcnmsts0"`
+	RequestID string      `json:"requestID" example:"buckkbuvvhfijcnmsts0"`
 }
 
 // SuccessJSON 成功返回
